@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b3d2e" />
+  <title>World Cup Soccer ⚽ — Claude World Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- ===== HOME SCREEN ===== -->
+    <section id="screen-home" class="screen active">
+      <div class="home-bg"></div>
+      <div class="home-content">
+        <div class="trophy">🏆</div>
+        <h1 class="title">WORLD CUP<span>SOCCER</span></h1>
+        <p class="subtitle">32개국이 겨루는 풀 시뮬레이션 — 직접 플레이하라</p>
+        <div class="home-buttons">
+          <button class="btn btn-primary" data-action="start-tournament">🏆 월드컵 시작</button>
+          <button class="btn" data-action="quick-match">⚡ 빠른 경기</button>
+          <button class="btn btn-ghost" data-action="show-howto">❔ 조작법</button>
+        </div>
+        <div class="credits">Claude World Cup · Canvas Engine</div>
+      </div>
+    </section>
+
+    <!-- ===== TEAM SELECT ===== -->
+    <section id="screen-select" class="screen">
+      <header class="bar">
+        <button class="btn btn-back" data-action="home">‹ 뒤로</button>
+        <h2 id="select-title">국가대표를 선택하세요</h2>
+        <span class="spacer"></span>
+      </header>
+      <div id="team-grid" class="team-grid"></div>
+    </section>
+
+    <!-- ===== TOURNAMENT HUB ===== -->
+    <section id="screen-tournament" class="screen">
+      <header class="bar">
+        <button class="btn btn-back" data-action="home">‹ 홈</button>
+        <h2>🏆 월드컵 — <span id="t-stage-label">조별리그</span></h2>
+        <span class="spacer"></span>
+        <button class="btn btn-sm" id="btn-sim-others">다른 경기 시뮬레이션 ⏩</button>
+      </header>
+      <div class="tournament-body">
+        <div id="groups-view" class="groups-view"></div>
+        <div id="bracket-view" class="bracket-view hidden"></div>
+      </div>
+      <div class="tournament-footer">
+        <div id="next-match-card" class="next-match-card"></div>
+      </div>
+    </section>
+
+    <!-- ===== MATCH ===== -->
+    <section id="screen-match" class="screen">
+      <div class="scoreboard">
+        <div class="sb-team sb-home">
+          <span class="sb-flag" id="sb-home-flag">🏳️</span>
+          <span class="sb-name" id="sb-home-name">HOME</span>
+        </div>
+        <div class="sb-center">
+          <div class="sb-score"><span id="sb-home-score">0</span> : <span id="sb-away-score">0</span></div>
+          <div class="sb-clock" id="sb-clock">00:00</div>
+        </div>
+        <div class="sb-team sb-away">
+          <span class="sb-name" id="sb-away-name">AWAY</span>
+          <span class="sb-flag" id="sb-away-flag">🏳️</span>
+        </div>
+      </div>
+      <div class="pitch-wrap">
+        <canvas id="pitch"></canvas>
+        <div id="match-overlay" class="match-overlay hidden"></div>
+      </div>
+      <div class="touch-controls" id="touch-controls">
+        <div class="dpad">
+          <button class="dbtn" data-dir="up">▲</button>
+          <div class="dpad-mid">
+            <button class="dbtn" data-dir="left">◀</button>
+            <button class="dbtn" data-dir="right">▶</button>
+          </div>
+          <button class="dbtn" data-dir="down">▼</button>
+        </div>
+        <div class="action-buttons">
+          <button class="abtn abtn-pass" data-act="pass">패스<br>A</button>
+          <button class="abtn abtn-shoot" data-act="shoot">슛<br>B</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== HOW TO ===== -->
+    <div id="howto-modal" class="modal hidden">
+      <div class="modal-card">
+        <h3>🎮 조작법</h3>
+        <ul class="howto-list">
+          <li><b>이동</b> — 방향키 / WASD 또는 화면 D-패드</li>
+          <li><b>패스</b> — <kbd>J</kbd> 또는 A 버튼 (가까운 동료에게)</li>
+          <li><b>슛 / 클리어</b> — <kbd>K</kbd> 또는 B 버튼 (길게 누르면 강하게)</li>
+          <li><b>선수 전환</b> — 공에서 멀면 자동으로 가까운 선수 조작</li>
+        </ul>
+        <p class="howto-tip">전반·후반 각 90초. 공을 가로채 골문에 넣으세요!</p>
+        <button class="btn btn-primary" data-action="close-howto">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/teams.js"></script>
+  <script src="js/match.js"></script>
+  <script src="js/tournament.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
