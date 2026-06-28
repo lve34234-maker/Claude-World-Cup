@@ -72,9 +72,7 @@
       // 빠른 경기: 랜덤 상대
       let opp;
       do { opp = TEAMS[Math.floor(Math.random() * TEAMS.length)]; } while (opp.id === id);
-      startMatch(teamById(id), opp, (res) => {
-        showResultOverlay(teamById(id), opp, res, () => goHome());
-      });
+      startMatch(teamById(id), opp, () => goHome());
     }
   }
 
@@ -194,12 +192,10 @@
     const t = state.tournament;
     const fx = m.fixture || m.tie;
     startMatch(fx.home, fx.away, (res) => {
-      showResultOverlay(fx.home, fx.away, res, () => {
-        t.reportUserResult(res.home, res.away);
-        t.tryAdvance();
-        renderTournament();
-        show("screen-tournament");
-      });
+      t.reportUserResult(res.home, res.away);
+      t.tryAdvance();
+      renderTournament();
+      show("screen-tournament");
     });
   }
 
@@ -211,6 +207,23 @@
     renderTournament();
   });
 
+  /* ---------- HUD ---------- */
+  function resetHud() {
+    $("#poss-home").style.width = "50%";
+    $("#poss-home-pct").textContent = "50%"; $("#poss-away-pct").textContent = "50%";
+    $("#shots-home").textContent = "0"; $("#shots-away").textContent = "0";
+    $("#cards-home").textContent = ""; $("#cards-away").textContent = "";
+  }
+  function updateHud(s) {
+    $("#poss-home").style.width = s.possHome + "%";
+    $("#poss-home-pct").textContent = s.possHome + "%";
+    $("#poss-away-pct").textContent = s.possAway + "%";
+    $("#shots-home").textContent = s.home.shots;
+    $("#shots-away").textContent = s.away.shots;
+    $("#cards-home").textContent = "🟨".repeat(s.home.yellow) + "🟥".repeat(s.home.red);
+    $("#cards-away").textContent = "🟨".repeat(s.away.yellow) + "🟥".repeat(s.away.red);
+  }
+
   /* ---------- 경기 실행 ---------- */
   function startMatch(home, away, onEnd) {
     show("screen-match");
@@ -221,23 +234,48 @@
     $("#sb-home-score").textContent = "0";
     $("#sb-away-score").textContent = "0";
     $("#sb-clock").textContent = "00:00";
-    $("#match-overlay").classList.add("hidden");
-
-    if (state.engine) state.engine.destroy();
-    // 캔버스가 레이아웃되도록 다음 프레임에 시작
-    requestAnimationFrame(() => {
-      const engine = new MatchEngine($("#pitch"), home, away, {
-        onGoal: (scorer, score) => {
-          $("#sb-home-score").textContent = score.home;
-          $("#sb-away-score").textContent = score.away;
-        },
-        onClock: (label) => { $("#sb-clock").textContent = label; },
-        onEnd: (res) => { engine.destroy(); onEnd(res); },
-      });
-      state.engine = engine;
-      engine.start();
-    });
+    $("#commentary").innerHTML = "";
+    resetHud();
+    if (state.engine) { state.engine.destroy(); state.engine = null; }
     bindTouchControls();
+
+    // 킥오프 전 전술(포메이션) 선택
+    showTactics(home, (formation) => {
+      if (window.Sound) { window.Sound.init(); window.Sound.setEnabled(true); }
+      requestAnimationFrame(() => {
+        const engine = new MatchEngine($("#pitch"), home, away, {
+          userFormation: formation,
+          onGoal: (scorer, score) => {
+            $("#sb-home-score").textContent = score.home;
+            $("#sb-away-score").textContent = score.away;
+          },
+          onClock: (label) => { $("#sb-clock").textContent = label; },
+          onStats: (s) => updateHud(s),
+          onEnd: (res) => { engine.destroy(); showResultOverlay(home, away, res, () => onEnd(res)); },
+        });
+        engine.setTicker($("#commentary"));
+        state.engine = engine;
+        engine.start();
+      });
+    });
+  }
+
+  function showTactics(home, ready) {
+    const ov = $("#match-overlay");
+    ov.classList.remove("hidden");
+    const forms = (window.MatchEngine && window.MatchEngine.FORMATIONS) || ["4-3-3", "4-4-2", "3-5-2"];
+    ov.innerHTML = `
+      <div class="result-card tactics-card">
+        <div class="rc-final">${home.flag} ${home.name} — 전술 선택</div>
+        <div class="tactics-grid">
+          ${forms.map((f, i) => `<button class="btn ${i === 0 ? "btn-primary" : ""} tac-btn" data-f="${f}">${f}</button>`).join("")}
+        </div>
+        <div class="tactics-hint">포메이션을 고르고 킥오프! (기본 4-3-3)</div>
+      </div>`;
+    $$(".tac-btn", ov).forEach((b) => b.addEventListener("click", () => {
+      ov.classList.add("hidden");
+      ready(b.dataset.f);
+    }));
   }
 
   function showResultOverlay(home, away, res, next) {
@@ -247,6 +285,8 @@
     if (res.home > res.away) verdict = `${home.flag} ${home.name} 승리!`;
     else if (res.home < res.away) verdict = `${away.flag} ${away.name} 승리!`;
     else verdict = "무승부";
+    const st = res.stats || { possHome: 50, possAway: 50, home: {}, away: {} };
+    const row = (label, h, a) => `<tr><td>${h ?? 0}</td><th>${label}</th><td>${a ?? 0}</td></tr>`;
     ov.innerHTML = `
       <div class="result-card">
         <div class="rc-final">FULL TIME</div>
@@ -256,6 +296,15 @@
           <span>${away.name} ${away.flag}</span>
         </div>
         <div class="rc-verdict">${verdict}</div>
+        <table class="stat-table">
+          ${row("점유율(%)", st.possHome, st.possAway)}
+          ${row("슈팅", st.home.shots, st.away.shots)}
+          ${row("유효슈팅", st.home.sot, st.away.sot)}
+          ${row("코너킥", st.home.corners, st.away.corners)}
+          ${row("파울", st.home.fouls, st.away.fouls)}
+          ${row("경고🟨", st.home.yellow, st.away.yellow)}
+          ${row("퇴장🟥", st.home.red, st.away.red)}
+        </table>
         <button class="btn btn-primary" id="rc-next">계속 ▶</button>
       </div>`;
     $("#rc-next").addEventListener("click", next);
@@ -282,6 +331,12 @@
     });
     $$(".abtn").forEach((b) => {
       const act = b.dataset.act;
+      if (act === "switch") {
+        const sw = (e) => { e.preventDefault(); if (state.engine) state.engine.switchPlayer(); };
+        b.addEventListener("touchstart", sw, { passive: false });
+        b.addEventListener("mousedown", sw);
+        return;
+      }
       const on = (e) => { e.preventDefault(); if (state.engine) state.engine.setInput(act, true); };
       const off = (e) => { e.preventDefault(); if (state.engine) state.engine.setInput(act, false); };
       b.addEventListener("touchstart", on, { passive: false });

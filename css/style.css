@@ -269,6 +269,57 @@ kbd {
 }
 .modal-card .btn { width: 100%; }
 
+/* ---------- Match HUD (stats) ---------- */
+.match-hud {
+  display: flex; align-items: center; gap: 14px;
+  padding: 6px 16px; background: #0b1410;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.hud-col { display: flex; flex-direction: column; align-items: center; min-width: 46px; }
+.hud-col b { font-family: "Russo One"; font-size: 1.3rem; line-height: 1; }
+.hud-left b { color: #4fd17e; } .hud-right b { color: #ff6b6b; }
+.hud-cards { font-size: .7rem; letter-spacing: -2px; height: 14px; }
+.hud-mid { flex: 1; }
+.poss-label { text-align: center; font-size: .72rem; color: var(--muted); margin-bottom: 2px; }
+.poss-bar { height: 8px; border-radius: 5px; overflow: hidden; background: #d63b3b; }
+.poss-bar i { display: block; height: 100%; background: #19b25b; transition: width .4s; }
+.poss-sub { text-align: center; font-size: .66rem; color: var(--muted); margin-top: 1px; }
+
+/* ---------- Commentary ticker ---------- */
+.commentary {
+  position: absolute; left: 12px; bottom: 12px; z-index: 4;
+  display: flex; flex-direction: column-reverse; gap: 5px; max-width: 70%;
+  pointer-events: none;
+}
+.commentary .tick {
+  background: rgba(0,0,0,.6); color: #eaf3ee; backdrop-filter: blur(3px);
+  border-left: 3px solid var(--gold); padding: 6px 12px; border-radius: 8px;
+  font-size: .92rem; font-weight: 600; transition: opacity .8s; opacity: 1;
+  animation: tickIn .3s ease;
+}
+.commentary .tick.fade { opacity: 0; }
+@keyframes tickIn { from { transform: translateX(-12px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- Floating player name ---------- */
+.player-tag {
+  position: absolute; z-index: 4; transform: translate(-50%, -100%);
+  background: rgba(10,20,16,.82); color: #fff; padding: 2px 8px; border-radius: 8px;
+  font-size: .8rem; font-weight: 700; white-space: nowrap; pointer-events: none;
+  border: 1px solid rgba(255,255,255,.15);
+}
+
+/* ---------- Tactics / stat table ---------- */
+.tactics-card .tactics-grid { display: flex; gap: 12px; justify-content: center; margin: 18px 0 12px; }
+.tac-btn { min-width: 88px; font-size: 1.1rem; }
+.tactics-hint { color: var(--muted); font-size: .9rem; }
+.stat-table { width: 100%; margin: 16px 0 20px; border-collapse: collapse; }
+.stat-table td, .stat-table th { padding: 5px 10px; text-align: center; font-size: .95rem; }
+.stat-table th { color: var(--muted); font-weight: 600; width: 50%; }
+.stat-table td { font-family: "Russo One"; font-size: 1.05rem; width: 25%; }
+.stat-table tr:nth-child(odd) { background: rgba(255,255,255,.03); }
+
+.abtn-switch { background: linear-gradient(135deg, #8a5cff, #6b3bd6); }
+
 /* ---------- Scrollbar ---------- */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #2a3a47; border-radius: 4px; }

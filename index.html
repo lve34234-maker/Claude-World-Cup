@@ -70,13 +70,24 @@
           <span class="sb-flag" id="sb-away-flag">🏳️</span>
         </div>
       </div>
+      <div class="match-hud" id="match-hud">
+        <div class="hud-col hud-left"><b id="shots-home">0</b><span class="hud-cards" id="cards-home"></span></div>
+        <div class="hud-mid">
+          <div class="poss-label">점유율 <span id="poss-home-pct">50%</span> · <span id="poss-away-pct">50%</span></div>
+          <div class="poss-bar"><i id="poss-home" style="width:50%"></i></div>
+          <div class="poss-sub">슈팅</div>
+        </div>
+        <div class="hud-col hud-right"><b id="shots-away">0</b><span class="hud-cards" id="cards-away"></span></div>
+      </div>
       <div class="pitch-wrap">
         <canvas id="pitch"></canvas>
+        <div id="commentary" class="commentary"></div>
         <div id="match-overlay" class="match-overlay hidden"></div>
       </div>
       <div class="touch-controls" id="touch-controls">
-        <div class="move-hint">🖱️ 화면을 <b>클릭/터치</b>해 선수를 이동시키세요 (롤 방식)</div>
+        <div class="move-hint">🖱️ 빈 곳 <b>클릭</b>=이동 · 동료 <b>클릭</b> 또는 <b>전환</b>=선수 변경</div>
         <div class="action-buttons">
+          <button class="abtn abtn-switch" data-act="switch">전환<br>Q</button>
           <button class="abtn abtn-pass" data-act="pass">패스<br>A</button>
           <button class="abtn abtn-shoot" data-act="shoot">슛<br>B</button>
         </div>
@@ -88,12 +99,12 @@
       <div class="modal-card">
         <h3>🎮 조작법</h3>
         <ul class="howto-list">
-          <li><b>이동</b> — 경기장을 마우스로 <b>클릭</b>(또는 터치)하면 그 위치로 이동 (롤 방식)</li>
+          <li><b>이동</b> — 빈 곳을 <b>클릭/터치</b>하면 조작 중인 선수가 그 위치로 이동 (롤 방식)</li>
+          <li><b>선수 변경</b> — 동료를 <b>클릭</b>하거나 <kbd>Q</kbd>/전환 버튼으로 직접 선택 (자동 전환 없음)</li>
           <li><b>패스</b> — <kbd>J</kbd> 또는 A 버튼 (열린 동료에게)</li>
           <li><b>슛 / 클리어</b> — <kbd>K</kbd> 또는 B 버튼 (길게 누르면 강하게)</li>
-          <li><b>선수 전환</b> — 공에서 멀면 자동으로 가까운 선수 조작</li>
         </ul>
-        <p class="howto-tip">전반·후반 각 90초. 공을 가로채 골문에 넣으세요!</p>
+        <p class="howto-tip">11 vs 11 · 오프사이드 · 파울/프리킥 · 페널티킥 · 옐로/레드 카드 · 스로인/코너/골킥 · 추가시간 · 체력까지 — 실제 축구처럼!</p>
         <button class="btn btn-primary" data-action="close-howto">확인</button>
       </div>
     </div>
@@ -101,6 +112,9 @@
 
   <script src="js/lib/three.min.js"></script>
   <script src="js/teams.js"></script>
+  <script src="js/names.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/commentary.js"></script>
   <script src="js/match.js"></script>
   <script src="js/tournament.js"></script>
   <script src="js/main.js"></script>
